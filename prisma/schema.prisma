@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User { 
+  id String @id // Firebase UID 
+  name String 
+  email String @unique 
+  img String? // Profile image 
+  role Role @default(USER) 
+  groups Group[] @relation("UserGroups") 
+  createdGroups Group[] @relation("GroupCreator") 
+  createdEvents Event[] @relation("EventCreator") 
+  createdTrainings Training[] @relation("TrainingCreator") 
+  messages Chat[] 
+  eventParticipants EventParticipant[] 
+  trainingParticipants TrainingParticipant[] 
+  bookings Booking[] 
+  createdAt DateTime @default(now()) 
+}
+
+model Group {
+  id           String     @id // Format: G001, G002, ...
+  name         String
+  description  String?
+  img          String?
+  createdById  String
+  createdBy    User        @relation("GroupCreator", fields: [createdById], references: [id])
+  members      User[]      @relation("UserGroups")
+  chats        Chat[]
+  price        Float?
+  isExclusive  Boolean
+  createdAt    DateTime    @default(now())
+}
+
+model Event {
+  id            String              @id // Format: E001
+  title         String
+  description   String?
+  img           String?
+  eventType     EventType
+  createdById   String
+  createdBy     User                @relation("EventCreator", fields: [createdById], references: [id])
+  startDate     DateTime
+  endDate       DateTime
+  location      String?
+  isPaid        Boolean             @default(false)
+  price         Float?
+  participants  EventParticipant[]
+}
+
+model EventParticipant {
+  id         String               @id // Format: EP001
+  eventId    String
+  userId     String
+  status     ParticipationStatus  @default(REGISTERED)
+  event      Event                @relation(fields: [eventId], references: [id])
+  user       User                 @relation(fields: [userId], references: [id])
+}
+
+model Training {
+  id           String              @id // Format: T001
+  title        String
+  description  String?
+  img          String?
+  coachId      String
+  coach        User                @relation("TrainingCreator", fields: [coachId], references: [id])
+  date         DateTime
+  price        Float?
+  slots        Int
+  participants TrainingParticipant[]
+}
+
+model TrainingParticipant {
+  id          String              @id // Format: TP001
+  trainingId  String
+  userId      String
+  status      ParticipationStatus @default(REGISTERED)
+  training    Training            @relation(fields: [trainingId], references: [id])
+  user        User                @relation(fields: [userId], references: [id])
+}
+
+model Chat {
+  id        String   @id // Format: C001
+  groupId   String
+  userId    String
+  message   String
+  createdAt DateTime  @default(now())
+  group     Group     @relation(fields: [groupId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model SportCenter {
+  id     String        @id // Format: SC001
+  name   String
+  fields SportsField[]
+}
+
+model SportsField {
+  id             String        @id // Format: SF001
+  name           String
+  img            String?
+  price          Float
+  fieldType      FieldType
+  sportCenterId  String
+  sportCenter    SportCenter   @relation(fields: [sportCenterId], references: [id])
+  schedules      Schedule[]
+}
+
+model Schedule {
+  id          String       @id // Format: S001
+  fieldId     String
+  startTime   DateTime
+  endTime     DateTime
+  isAvailable Boolean      @default(true)
+  field       SportsField  @relation(fields: [fieldId], references: [id])
+  bookings    Booking[]
+}
+
+model Booking {
+  id          String          @id // Format: B001
+  userId      String
+  scheduleId  String
+  status      BookingStatus   @default(PENDING)
+  createdAt   DateTime        @default(now())
+  user        User            @relation(fields: [userId], references: [id])
+  schedule    Schedule        @relation(fields: [scheduleId], references: [id])
+}
+
+// ENUMS
+
+enum Role {
+  USER
+  COACH
+  ADMIN
+}
+
+enum SubscriptionType {
+  FREE
+  PREMIUM
+  ELITE
+}
+
+enum EventType {
+  ONLINE
+  OFFLINE
+}
+
+enum ParticipationStatus {
+  REGISTERED
+  ATTENDED
+  CANCELLED
+}
+
+enum FieldType {
+  BADMINTON
+  BASKETBALL
+  FUTSAL
+  TENNIS
+  VOLLEYBALL
+  OTHER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}

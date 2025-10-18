@@ -75,85 +75,6 @@ Ini adalah backend service untuk Fit Connect, sebuah aplikasi yang menghubungkan
 
 ## Susunan Project
 ```
-Markdown
-
-# Backend Fit Connect
-
-Ini adalah backend service untuk Fit Connect, sebuah aplikasi yang menghubungkan pengguna untuk menemukan dan berpartisipasi dalam kegiatan olahraga, grup, event, dan sesi latihan.
-
-## Fitur Utama
-
-* **Manajemen Pengguna**: Membuat dan mengelola profil pengguna, dengan ID yang disinkronkan dari Firebase Authentication.
-* **Manajemen Grup**:
-    * Membuat, memperbarui, dan menghapus grup.
-    * Bergabung (join) dan keluar (leave) dari grup.
-    * Mengirim dan mengambil riwayat chat dalam grup.
-    * Melihat semua grup beserta jumlah anggotanya.
-* **Manajemen Event**:
-    * Membuat event baru (Online/Offline).
-    * Melihat semua event yang tersedia.
-    * Mendaftar (join) ke sebuah event.
-* **Manajemen Training**:
-    * Membuat sesi latihan (training) baru oleh coach.
-    * Melihat semua sesi latihan yang tersedia.
-    * Mendaftar (join) ke sesi latihan dengan manajemen kuota (slots).
-* **ID Kustom**: Menggunakan generator ID kustom dengan prefix (misal: `G001` untuk Grup, `E001` untuk Event, `T001` untuk Training).
-
-## Teknologi yang Digunakan
-
-* **Node.js**: Lingkungan eksekusi JavaScript di sisi server.
-* **Express.js**: Framework web minimalis untuk membangun API.
-* **Prisma**: ORM (Object-Relational Mapping) modern untuk interaksi database.
-* **PostgreSQL**: Sistem database relasional yang digunakan.
-* **Nodemon**: Utility untuk auto-restart server saat pengembangan.
-
-## Prasyarat
-
-* Node.js (direkomendasikan v18 atau lebih baru)
-* NPM (Node Package Manager)
-* Database PostgreSQL yang sedang berjalan
-
-## Instalasi
-
-1.  **Clone repositori ini:**
-    ```bash
-    git clone [https://github.com/brianalexanderr/backend-fit-connect.git](https://github.com/brianalexanderr/backend-fit-connect.git)
-    cd backend-fit-connect
-    ```
-
-2.  **Install dependensi:**
-    ```bash
-    npm install
-    ```
-
-3.  **Siapkan file `.env`:**
-    Buat file bernama `.env` di direktori root project dan tambahkan variabel lingkungan untuk koneksi database.
-
-    ```ini
-    # Ganti dengan URL koneksi PostgreSQL Anda
-    DATABASE_URL="postgresql://USERNAME:PASSWORD@HOST:PORT/DATABASE_NAME"
-    ```
-
-4.  **Jalankan Migrasi Database:**
-    Perintah ini akan membuat tabel-tabel di database Anda berdasarkan `schema.prisma`.
-    ```bash
-    npx prisma migrate dev
-    ```
-
-5.  **Generate Prisma Client:**
-    Perintah ini menghasilkan Prisma Client yang di-type-safe berdasarkan skema Anda.
-    ```bash
-    npx prisma generate
-    ```
-
-6.  **Jalankan Server:**
-    Server akan berjalan di `http://localhost:3000` (atau port yang ditentukan di `src/index.js`).
-    ```bash
-    nodemon src/index.js
-    ```
-
-## Susunan Project
-
 / ├── prisma/ <b>
 │ └── schema.prisma # Skema database Prisma <b>
 ├── src/ <b>
@@ -644,3 +565,4 @@ Kontribusi sangat diterima! Jika Anda ingin berkontribusi:
 ## Lisensi
 
 Proyek ini dilisensikan di bawah Lisensi MIT.
+

@@ -34,14 +34,26 @@ const createEvent = async (req, res) => {
 const getAllEvents = async (req, res) => {
   try {
     const events = await prisma.event.findMany({
+      orderBy: {
+        title: 'asc',
+      },
       include: {
         createdBy: true,
         participants: {
           include: { user: true },
         },
+        _count: {
+          select: {participants: true},
+        }
       },
     });
-    res.json(events);
+
+    const formattedEvents = events.map(event => ({
+      ...event,
+      participantCount: event._count.participants,
+    }));
+
+    res.json(formattedEvents);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

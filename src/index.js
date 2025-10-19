@@ -10,7 +10,7 @@ const app = express();
 PORT = 3000;
 
 app.use(express.json());
-app.use("api/users", userRoutes);
+app.use("/api/users", userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/trainings', trainingRoutes);

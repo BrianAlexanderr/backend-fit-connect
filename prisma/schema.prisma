@@ -8,20 +8,22 @@ datasource db {
 }
 
 model User { 
-  id String @id // Firebase UID 
-  name String 
-  email String @unique 
-  img String? // Profile image 
-  role Role @default(USER) 
-  groups Group[] @relation("UserGroups") 
-  createdGroups Group[] @relation("GroupCreator") 
-  createdEvents Event[] @relation("EventCreator") 
-  createdTrainings Training[] @relation("TrainingCreator") 
-  messages Chat[] 
-  eventParticipants EventParticipant[] 
-  trainingParticipants TrainingParticipant[] 
-  bookings Booking[] 
-  createdAt DateTime @default(now()) 
+  id                    String @id // Firebase UID 
+  name                  String 
+  email                 String @unique 
+  img                   String? // Profile image
+  phone                 String?
+  dateOfBirth           DateTime?
+  role                  Role @default(USER) 
+  groups                Group[] @relation("UserGroups") 
+  createdGroups         Group[] @relation("GroupCreator") 
+  createdEvents         Event[] @relation("EventCreator") 
+  createdTrainings      Training[] @relation("TrainingCreator") 
+  messages              Chat[] 
+  eventParticipants     EventParticipant[] 
+  trainingParticipants  TrainingParticipant[] 
+  bookings              Booking[] 
+  createdAt             DateTime @default(now()) 
 }
 
 model Group {
@@ -68,6 +70,7 @@ model Training {
   title        String
   description  String?
   img          String?
+  location     String?
   coachId      String
   coach        User                @relation("TrainingCreator", fields: [coachId], references: [id])
   date         DateTime

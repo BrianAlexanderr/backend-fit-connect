@@ -5,6 +5,7 @@ const eventRoutes = require("./routes/eventRoutes");
 const trainingRoutes = require("./routes/trainingRoutes");
 const bodyParser = require("body-parser");
 const path = require("path");
+const cors = require("cors");
 
 const app = express();
 
@@ -12,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Static folder

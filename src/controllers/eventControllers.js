@@ -33,29 +33,79 @@ const createEvent = async (req, res) => {
 // Get all events
 const getAllEvents = async (req, res) => {
   try {
+    const { userId } = req.query; // get userId from query param
+    if (!userId) {
+      return res.status(400).json({ error: "userId is required" });
+    }
+
+    // Fetch all events with participants and creator
     const events = await prisma.event.findMany({
-      orderBy: {
-        title: 'asc',
-      },
+      orderBy: { title: 'asc' },
       include: {
         createdBy: true,
         participants: {
           include: { user: true },
         },
         _count: {
-          select: {participants: true},
-        }
+          select: { participants: true },
+        },
       },
     });
 
-    const formattedEvents = events.map(event => ({
+    // Exclude events where user has already joined
+    const filteredEvents = events
+      .filter(event =>
+        !event.participants.some(p => p.userId === userId)
+      )
+      .map(event => ({
+        ...event,
+        participantCount: event._count.participants,
+      }));
+
+    res.json(filteredEvents);
+  } catch (err) {
+    console.error("❌ getAllEvents error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getEventById = async (req, res) => {
+  try {
+    const { id } = req.params; // e.g. /events/E001
+
+    if (!id) {
+      return res.status(400).json({ error: "Event ID is required" });
+    }
+
+    const event = await prisma.event.findUnique({
+      where: { id },
+      include: {
+        createdBy: true, // include event creator details
+        participants: {
+          include: {
+            user: true, // include participant user info
+          },
+        },
+        _count: {
+          select: { participants: true },
+        },
+      },
+    });
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Format event for cleaner response
+    const formattedEvent = {
       ...event,
       participantCount: event._count.participants,
-    }));
+    };
 
-    res.json(formattedEvents);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json(formattedEvent);
+  } catch (error) {
+    console.error("❌ getEventById error:", error);
+    res.status(500).json({ error: "Failed to fetch event details" });
   }
 };
 
@@ -64,19 +114,29 @@ const joinEvent = async (req, res) => {
   try {
     const { userId, eventId } = req.body;
 
+    if (!userId || !eventId) {
+      return res.status(400).json({ message: "Missing userId or eventId" });
+    }
+
     // Prevent duplicate participation
     const existing = await prisma.eventParticipant.findFirst({
-      where: { userId, eventId: parseInt(eventId) },
+      where: { userId, eventId },
     });
     if (existing) return res.status(400).json({ message: "User already joined this event" });
 
+    // Generate a new ID for EventParticipant
+    const newId = await generateCustomId("eventParticipant", "EP");
+    // Adjust idGenerator usage according to your implementation
+
     const participant = await prisma.eventParticipant.create({
       data: {
+        id: newId,
         userId,
-        eventId: parseInt(eventId),
+        eventId,
         status: "REGISTERED",
       },
     });
+
     res.json(participant);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -99,4 +159,4 @@ const getUserEvents = async (req, res) => {
   }
 };
 
-module.exports = { createEvent, getAllEvents, joinEvent, getUserEvents };
+module.exports = { createEvent, getAllEvents, joinEvent, getUserEvents, getEventById };

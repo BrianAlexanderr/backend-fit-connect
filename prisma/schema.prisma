@@ -36,7 +36,7 @@ model Group {
   members      User[]      @relation("UserGroups")
   chats        Chat[]
   price        Float?
-  isExclusive  Boolean
+  isExclusive  Boolean?
   createdAt    DateTime    @default(now())
 }
 
